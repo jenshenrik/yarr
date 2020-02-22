@@ -14,12 +14,17 @@ def main():
     mouse = libtcod.Mouse()
     key = libtcod.Key()
 
+    con = libtcod.console_new(screen_width, screen_height)
+
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
-        libtcod.console_set_default_foreground(0, libtcod.white)
-        libtcod.console_put_char(0, player_x, player_y, '@', libtcod.BKGND_NONE)
+        libtcod.console_set_default_foreground(con, libtcod.white)
+        libtcod.console_put_char(con, player_x, player_y, '@', libtcod.BKGND_NONE)
+        libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
         libtcod.console_flush()
+
+        libtcod.console_put_char(con, player_x, player_y, ' ', libtcod.BKGND_NONE)
 
         action = handle_keys(key)
 
