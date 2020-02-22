@@ -1,6 +1,15 @@
 import tcod as libtcod
 
-def render_all(con, entities, screen_width, screen_height):
+def render_all(con, entities, game_map, screen_width, screen_height, colours):
+    # Draw tiles on the map
+    for y in range(game_map.height):
+        for x in range(game_map.width):
+            wall = game_map.tiles[x][y].block_sight
+            if wall:
+                libtcod.console_set_char_background(con, x, y, colours.get('dark_wall'))
+            else:
+                libtcod.console_set_char_background(con, x, y, colours.get('dark_ground'))
+
     # Draw all entities in the list
     for entity in entities:
         draw_entity(con, entity)
