@@ -26,5 +26,21 @@ class GameMap:
     def make_map(self):
         room1 = Rect(20, 15, 10, 15)
         room2 = Rect(35, 15, 10, 15)
+        room3 = Rect(20, 35, 25, 7)
         self.create_room(room1)
         self.create_room(room2)
+        self.create_room(room3)
+        self.create_h_tunnel(25, 40, 23)
+        self.create_v_tunnel(25, 30, 35)
+        self.create_v_tunnel(40, 30, 35)
+
+    def create_h_tunnel(self, x1, x2, y):
+        for x in range(min(x1, x2), max(x1, x2) +1):
+            self.tiles[x][y].blocked = False
+            self.tiles[x][y].block_sight= False
+
+    def create_v_tunnel(self, x, y1, y2):
+        for y in range(min(y1, y2), max(y1, y2) + 1):
+            self.tiles[x][y].blocked = False
+            self.tiles[x][y].block_sight= False
+            
