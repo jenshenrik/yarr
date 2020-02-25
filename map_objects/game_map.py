@@ -1,3 +1,5 @@
+from random import randint
+
 from map_objects.tile import Tile
 from map_objects.rectangle import Rect
 
@@ -23,16 +25,58 @@ class GameMap:
                 self.tiles[x][y].blocked = False
                 self.tiles[x][y].block_sight = False
 
-    def make_map(self):
-        room1 = Rect(20, 15, 10, 15)
-        room2 = Rect(35, 15, 10, 15)
-        room3 = Rect(20, 35, 25, 7)
-        self.create_room(room1)
-        self.create_room(room2)
-        self.create_room(room3)
-        self.create_h_tunnel(25, 40, 23)
-        self.create_v_tunnel(25, 30, 35)
-        self.create_v_tunnel(40, 30, 35)
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player):
+        print("making map")
+        rooms = []
+        num_rooms = 0
+
+        for r in range(max_rooms):
+            print("iterator: " + str(r))
+            print("creating room number " + str(num_rooms + 1))
+            # Random height and width of room
+            w = randint(room_min_size, room_max_size)
+            h = randint(room_min_size, room_max_size)
+            # Random position within boundaries
+            x = randint(0, map_width - w - 1)
+            y = randint(0, map_height - h - 1)
+            print("width: " + str(w))
+            print("height: " + str(h))
+            print("x: " + str(x))
+            print("y: " + str(y))
+
+            new_room = Rect(x, y, w, h)
+            for other_room in rooms:
+                if new_room.intersects(other_room):
+                    print("Intersection detected")
+                    break
+            else:
+                self.create_room(new_room)
+                (new_x, new_y) = new_room.center()
+                print("new room created")
+                if len(rooms) == 0:
+                    # Start player in the first room
+                    player.x = new_x
+                    player.y = new_y
+                    print("player starting position set")
+                else:
+                    # All rooms after the first:
+                    # connect it to the prev one with a tunnel
+
+                    # Center coords of prev room
+                    (prev_x, prev_y) = rooms[num_rooms - 1].center()
+
+                    # Flip a coin whether to go vert or hor first
+                    if randint(0, 1) == 1:
+                        self.create_h_tunnel(prev_x, new_x, prev_y)
+                        self.create_v_tunnel(prev_x, prev_y, new_y)
+                    else:
+                        self.create_v_tunnel(prev_x, prev_y, new_y)
+                        self.create_h_tunnel(prev_x, new_x, prev_y)
+
+                # Append the new room to the list of rooms
+                rooms.append(new_room)
+                print("rooms now have " + str(len(rooms)) + " entries")
+                num_rooms += 1
 
     def create_h_tunnel(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2) +1):
