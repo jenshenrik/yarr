@@ -20,8 +20,7 @@ def main():
     }
 
     player = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white)
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', libtcod.yellow)
-    entities = [npc, player]
+    entities = [player]
     game_map = GameMap(map_width, map_height)
     game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player)
 
