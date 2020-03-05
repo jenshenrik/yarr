@@ -68,10 +68,10 @@ class GameMap:
                     # Flip a coin whether to go vert or hor first
                     if randint(0, 1) == 1:
                         self.create_h_tunnel(prev_x, new_x, prev_y)
-                        self.create_v_tunnel(prev_x, prev_y, new_y)
+                        self.create_v_tunnel(new_x, prev_y, new_y)
                     else:
                         self.create_v_tunnel(prev_x, prev_y, new_y)
-                        self.create_h_tunnel(prev_x, new_x, prev_y)
+                        self.create_h_tunnel(prev_x, new_x, new_y)
 
                 # Append the new room to the list of rooms
                 rooms.append(new_room)
