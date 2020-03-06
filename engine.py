@@ -4,6 +4,7 @@ from render_functions import render_all, clear_all
 from fov_functions import initialize_fov, recompute_fov
 from entity import Entity, get_blocking_entities_at_location
 from map_objects.game_map import GameMap
+from game_states import GameStates
 
 def main():
     screen_width = 80
@@ -41,6 +42,8 @@ def main():
     libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
 
+    game_state = GameStates.PLAYERS_TURN
+
     mouse = libtcod.Mouse()
     key = libtcod.Key()
 
@@ -64,7 +67,7 @@ def main():
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
-        if move:
+        if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = move
 
             destination_x = player.x + dx
@@ -79,11 +82,19 @@ def main():
                     player.move(dx, dy)
                     fov_recompute = True
 
+                game_state = GameStates.ENEMY_TURN
+
         if exit:
             return True
 
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+
+        if game_state == GameStates.ENEMY_TURN:
+            for entity in entities:
+                if entity != player:
+                    print(' The ' + entity.name + ' ponders the meaning of its existence')
+            game_state = GameStates.PLAYERS_TURN
 
 if __name__ == '__main__':
     main()
