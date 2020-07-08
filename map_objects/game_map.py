@@ -4,7 +4,7 @@ from random import randint
 from map_objects.tile import Tile
 from map_objects.rectangle import Rect
 from entity import Entity
-from item_functions import heal
+from item_functions import heal, cast_lightning
 from render_functions import RenderOrder
 from components.ai import BasicMonster
 from components.fighter import Fighter
@@ -121,6 +121,13 @@ class GameMap:
             y = randint(room.y1 + 1, room.y2 - 1)
 
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                item_component = Item(use_function=heal, amount=4)
-                item = Entity(x, y, '!', tcod.violet, 'Healing Potion', render_order=RenderOrder.ITEM, item=item_component)
+                item_change = randint(0, 100)
+
+                if item_change < 70:
+                    item_component = Item(use_function=heal, amount=4)
+                    item = Entity(x, y, '!', tcod.violet, 'Healing Potion', render_order=RenderOrder.ITEM, item=item_component)
+                else:
+                    item_component = Item(use_function=cast_lightning, damage=20, maximum_range=5)
+                    item = Entity(x, y, '#', tcod.yellow, 'Lightning Scroll', render_order=RenderOrder.ITEM,
+                            item=item_component)
                 entities.append(item)
