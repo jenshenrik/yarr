@@ -43,3 +43,13 @@ class Inventory:
 
     def remove_item(self, item):
         self.items.remove(item)
+
+    def drop_item(self, item):
+        results = []
+
+        item.x = self.owner.x
+        item.y = self.owner.y
+
+        self.remove_item(item)
+        results.append({'item_dropped': item, 'message': Message('You dropped the {0}'.format(item.name), tcod.yellow)})
+        return results
