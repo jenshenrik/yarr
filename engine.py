@@ -11,8 +11,13 @@ from death_functions import kill_monster, kill_player
 def main():
     screen_width = 80
     screen_height = 50
+
+    bar_width = 20
+    panel_height = 7
+    panel_y = screen_height - panel_height
+
     map_width = 80
-    map_height = 45
+    map_height = 43
 
     room_max_size = 10
     room_min_size = 6
@@ -51,6 +56,7 @@ def main():
     key = libtcod.Key()
 
     con = libtcod.console_new(screen_width, screen_height)
+    panel = libtcod.console_new(screen_width, panel_height)
 
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
@@ -58,7 +64,8 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
-        render_all(con, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, colours)
+        render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, 
+                bar_width, panel_height, panel_y, colours)
         fov_recompute = False
 
         libtcod.console_flush()
