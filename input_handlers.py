@@ -23,6 +23,10 @@ def handle_main_menu(key):
         return {'load_game': True}
     elif key_char == 'c' or key.vk == tcod.KEY_ESCAPE:
         return {'exit': True}
+    elif key.vk == tcod.KEY_ENTER and key.lalt:
+        # Alt+Enter: toggle full screen
+        return {'fullscreen': True}
+
     return {}
 
 def handle_targeting_keys(key):
