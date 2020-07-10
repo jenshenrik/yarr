@@ -110,6 +110,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         mouse_action = handle_mouse(mouse)
 
         move = action.get('move')
+        wait = action.get('wait')
         pickup = action.get('pickup')
         show_inventory = action.get('show_inventory')
         drop_inventory = action.get('drop_inventory')
@@ -150,6 +151,9 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     break
             else:
                 message_log.add_message(Message('There is nothing here to pick up.', tcod.yellow))
+
+        elif wait:
+            game_state = GameStates.ENEMY_TURN
 
         if show_inventory:
             previous_game_state = game_state
