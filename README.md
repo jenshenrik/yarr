@@ -14,5 +14,7 @@ opens it to drop items. `c` opens character info. Press `Esc` to close menus.
 
 Press `Enter` when standing on stairs to descend deeper into the dungeon.
 
+`Alt+Enter` toggles fullscreen, although maybe not on all screens...
+
 ## To-do
 Find some way to make it pirate themed...
