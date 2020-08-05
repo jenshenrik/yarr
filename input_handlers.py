@@ -1,6 +1,35 @@
+from typing import Optional
+
 import tcod
 
+from actions import Action, EscapeAction, MovementAction
+
 from game_states import GameStates
+
+
+class EventHandler(tcod.event.EventDispatch[Action]):
+    def ev_quit(self, event: tcod.event.Quit) -> Optional[Action]:
+        raise SystemExit()
+
+    def ev_keydown(self, event: tcod.event.KeyDown) -> Optional[Action]:
+        action: Optional[Action] = None
+
+        key = event.sym
+
+        if key == tcod.event.K_UP:
+            action = MovementAction(dx=0, dy=-1)
+        elif key == tcod.event.K_DOWN:
+            action = MovementAction(dx=0, dy=1)
+        elif key == tcod.event.K_LEFT:
+            action = MovementAction(dx=-1, dy=0)
+        elif key == tcod.event.K_RIGHT:
+            action = MovementAction(dx=1, dy=0)
+
+        elif key == tcod.event.K_ESCAPE:
+            action = EscapeAction()
+
+        return action
+
 
 def handle_keys(key, game_state):
     if game_state == GameStates.PLAYERS_TURN:
@@ -18,122 +47,130 @@ def handle_keys(key, game_state):
 
     return {}
 
+
 def handle_main_menu(key):
     key_char = chr(key.c)
 
-    if key_char == 'a':
-        return {'new_game': True}
-    elif key_char == 'b':
-        return {'load_game': True}
-    elif key_char == 'c' or key.vk == tcod.KEY_ESCAPE:
-        return {'exit': True}
+    if key_char == "a":
+        return {"new_game": True}
+    elif key_char == "b":
+        return {"load_game": True}
+    elif key_char == "c" or key.vk == tcod.KEY_ESCAPE:
+        return {"exit": True}
     elif key.vk == tcod.KEY_ENTER and key.lalt:
         # Alt+Enter: toggle full screen
-        return {'fullscreen': True}
+        return {"fullscreen": True}
 
     return {}
+
 
 def handle_level_up_menu(key):
     if key:
         key_char = chr(key.c)
 
-        if key_char == 'a':
-            return {'level_up': 'hp'}
-        elif key_char == 'b':
-            return {'level_up': 'str'}
-        elif key_char == 'c':
-            return {'level_up': 'def'}
+        if key_char == "a":
+            return {"level_up": "hp"}
+        elif key_char == "b":
+            return {"level_up": "str"}
+        elif key_char == "c":
+            return {"level_up": "def"}
     return {}
+
 
 def handle_character_screen(key):
     if key.vk == tcod.KEY_ESCAPE:
-        return {'exit': True}
+        return {"exit": True}
 
     return {}
+
 
 def handle_targeting_keys(key):
     if key.vk == tcod.KEY_ESCAPE:
-        return {'exit': True}
+        return {"exit": True}
 
     return {}
+
 
 def handle_mouse(mouse):
     (x, y) = (mouse.cx, mouse.cy)
 
     if mouse.lbutton_pressed:
-        return {'left_click': (x, y)}
+        return {"left_click": (x, y)}
     elif mouse.rbutton_pressed:
-        return {'right_click': (x, y)}
+        return {"right_click": (x, y)}
 
     return {}
 
+
 def handle_inventory_keys(key):
-    index = key.c - ord('a')
+    index = key.c - ord("a")
 
     if index >= 0:
-        return {'inventory_index': index}
+        return {"inventory_index": index}
 
     if key.vk == tcod.KEY_ENTER and key.lalt:
         # Alt+Enter: toggle full screen
-        return {'fullscreen': True}
+        return {"fullscreen": True}
     elif key.vk == tcod.KEY_ESCAPE:
         # Exit the menu
-        return {'exit': True}
+        return {"exit": True}
 
     return {}
+
 
 def handle_player_dead_keys(key):
     key_char = chr(key.c)
 
-    if key_char == 'i':
-        return {'show_inventory': True}
+    if key_char == "i":
+        return {"show_inventory": True}
 
     if key.vk == tcod.KEY_ENTER and key.lalt:
         # Alt+Enter: toggle full screen
-        return {'fullscreen': True}
+        return {"fullscreen": True}
     elif key.vk == tcod.KEY_ESCAPE:
         # Exit the menu
-        return {'exit': True}
+        return {"exit": True}
 
     return {}
+
 
 def handle_player_turn_keys(key):
     key_char = chr(key.c)
 
     # Movement keys
-    if key.vk == tcod.KEY_UP or key_char == 'k':
-        return {'move': (0, -1)}
-    elif key.vk == tcod.KEY_DOWN or key_char == 'j':
-        return {'move': (0, 1)}
-    elif key.vk == tcod.KEY_LEFT or key_char == 'h':
-        return {'move': (-1, 0)}
-    elif key.vk == tcod.KEY_RIGHT or key_char == 'l':
-        return {'move': (1, 0)}
-    elif key_char == 'y':
-        return {'move': (-1, -1)}
-    elif key_char == 'u':
-        return {'move': (1, -1)}
-    elif key_char == 'b':
-        return {'move': (-1, 1)}
-    elif key_char == 'n':
-        return {'move': (1, 1)}
-    elif key_char == 'z':
-        return {'wait': True}
+    if key.vk == tcod.KEY_UP or key_char == "k":
+        return {"move": (0, -1)}
+    elif key.vk == tcod.KEY_DOWN or key_char == "j":
+        return {"move": (0, 1)}
+    elif key.vk == tcod.KEY_LEFT or key_char == "h":
+        return {"move": (-1, 0)}
+    elif key.vk == tcod.KEY_RIGHT or key_char == "l":
+        return {"move": (1, 0)}
+    elif key_char == "y":
+        return {"move": (-1, -1)}
+    elif key_char == "u":
+        return {"move": (1, -1)}
+    elif key_char == "b":
+        return {"move": (-1, 1)}
+    elif key_char == "n":
+        return {"move": (1, 1)}
+    elif key_char == "z":
+        return {"wait": True}
     elif key.vk == tcod.KEY_ENTER:
-        return {'take_stairs': True}
-    elif key_char == 'c':
-        return {'show_character_screen': True}
-    elif key_char == 'g':
-        return {'pickup': True}
-    elif key_char == 'i':
-        return {'show_inventory': True}
-    elif key_char == 'd':
-        return {'drop_inventory': True}
+        return {"take_stairs": True}
+    elif key_char == "c":
+        return {"show_character_screen": True}
+    elif key_char == "g":
+        return {"pickup": True}
+    elif key_char == "i":
+        return {"show_inventory": True}
+    elif key_char == "d":
+        return {"drop_inventory": True}
 
     if key.vk == tcod.KEY_ENTER and key.lalt:
-        return {'fullscreen': True}
+        return {"fullscreen": True}
 
     if key.vk == tcod.KEY_ESCAPE:
-        return {'exit': True}
+        return {"exit": True}
 
     return {}
