@@ -1,10 +1,18 @@
-from typing import Tuple
+from __future__ import annotations
+
+import copy
+from typing import Tuple, TypeVar, TYPE_CHECKING
 
 import math
 import tcod
 
 from components.item import Item
 from render_functions import RenderOrder
+
+if TYPE_CHECKING:
+    from game_map import GameMap
+
+T = TypeVar("T", bound="Entity")
 
 
 class Entity:
@@ -14,12 +22,12 @@ class Entity:
 
     def __init__(
         self,
-        x: int,
-        y: int,
-        char: str,
-        color: Tuple[int, int, int],
-        name: str,
-        blocks=False,
+        x: int = 0,
+        y: int = 0,
+        char: str = "?",
+        color: Tuple[int, int, int] = (255, 255, 255),
+        name: str = "<Unnamed>",
+        blocks_movement: bool = False,
         render_order=RenderOrder.CORPSE,
         fighter=None,
         ai=None,
@@ -35,7 +43,7 @@ class Entity:
         self.char = char
         self.color = color
         self.name = name
-        self.blocks = blocks
+        self.blocks_movement = blocks_movement
         self.render_order = render_order
         self.fighter = fighter
         self.ai = ai
@@ -74,6 +82,14 @@ class Entity:
                 item = Item()
                 self.item = item
                 self.item.owner = self
+
+    def spawn(self: T, gamemap: GameMap, x: int, y: int) -> T:
+        """Spawn a copy of this instance at the given location"""
+        clone = copy.deepcopy(self)
+        clone.x = x
+        clone.y = y
+        gamemap.entities.add(clone)
+        return clone
 
     def move(self, dx: int, dy: int) -> None:
         self.x += dx
