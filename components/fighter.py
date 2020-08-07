@@ -1,63 +1,46 @@
-import tcod
+from __future__ import annotations
 
-from game_messages import Message
+from typing import TYPE_CHECKING
 
-class Fighter:
-    def __init__(self, hp, defense, power, xp=0):
-        self.base_max_hp = hp
-        self.hp = hp
-        self.base_defense = defense
-        self.base_power = power
-        self.xp = xp
+from components.base_component import BaseComponent
+from input_handlers import GameOverEventHandler
+from render_order import RenderOrder
 
-    @property
-    def max_hp(self):
-        if self.owner and self.owner.equipment:
-            bonus = self.owner.equipment.max_hp_bonus
-        else:
-            bonus = 0
-        return self.base_max_hp + bonus
+if TYPE_CHECKING:
+    from entity import Actor
 
-    @property
-    def power(self):
-        if self.owner and self.owner.equipment:
-            bonus = self.owner.equipment.power_bonus
-        else:
-            bonus = 0
-        return self.base_power + bonus
+
+class Fighter(BaseComponent):
+    entity: Actor
+
+    def __init__(self, hp: int, defense: int, power: int):
+        self.max_hp = hp
+        self._hp = hp
+        self.defense = defense
+        self.power = power
 
     @property
-    def defense(self):
-        if self.owner and self.owner.equipment:
-            bonus = self.owner.equipment.defense_bonus
+    def hp(self) -> int:
+        return self._hp
+
+    @hp.setter
+    def hp(self, value: int) -> None:
+        self._hp = max(0, min(value, self.max_hp))
+        if self._hp == 0 and self.entity.ai:
+            self.die()
+
+    def die(self) -> None:
+        if self.engine.player is self.entity:
+            death_message = "You died!"
+            self.engine.event_handler = GameOverEventHandler(self.engine)
         else:
-            bonus = 0
-        return self.base_defense + bonus
+            death_message = f"{self.entity.name} is dead!"
 
-    def take_damage(self, amount):
-        results = []
-        self.hp -= amount
-        if self.hp <= 0:
-            results.append({'dead': self.owner, 'xp': self.xp})
-        return results
+        self.entity.char = "%"
+        self.entity.color = (192, 0, 0)
+        self.entity.blocks_movement = False
+        self.entity.ai = None
+        self.entity.name = f"remains of {self.entity.name}"
+        self.entity.render_order = RenderOrder.CORPSE
 
-    def heal(self, amount):
-        self.hp += amount
-
-        if self.hp > self.max_hp:
-            self.hp = self.max_hp
-
-    def attack(self, target):
-        results = []
-        damage = self.power - target.fighter.defense
-
-        if damage > 0:
-            results.append({'message': Message('{0} attacks {1} for {2} hit points.'.format(
-                self.owner.name.capitalize(), target.name, str(damage)), tcod.white)})
-            results.extend(target.fighter.take_damage(damage))
-        else:
-            results.append({'message': Message('{0} attacks {1} but does no damage.'.format(
-                self.owner.name.capitalize(), target.name), tcod.white)})
-
-        return results
-
+        print(death_message)
